@@ -1,4 +1,5 @@
 {
+    "files.autoSave": "afterDelay",
     "go.buildOnSave": true,
     "go.lintOnSave": true,
     "go.vetOnSave": true,
