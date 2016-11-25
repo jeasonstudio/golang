@@ -1,5 +1,4 @@
 {
-    // "files.autoSave": "afterDelay",
     "go.buildOnSave": true,
     "go.lintOnSave": true,
     "go.vetOnSave": true,
@@ -10,10 +9,12 @@
     "go.vetFlags": [],
     "go.coverOnSave": false,
     "go.useCodeSnippetsOnFunctionSuggest": false,
-    "go.formatOnSave": true, 
+    "go.formatOnSave": true,
     "go.formatTool": "goreturns",
     "go.formatFlags": [],
     "go.goroot": "/usr/local/go",
     "go.gopath": "/Users/Jeason/Documents/ToDos/golang",
-    "go.gocodeAutoBuild": true
+    "go.gocodeAutoBuild": true,
+    "files.trimTrailingWhitespace": true,
+    "files.autoSave": "onFocusChange"
 }

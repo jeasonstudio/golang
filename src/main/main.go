@@ -2,27 +2,33 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"net/http"
 )
 
-func sayhelloName(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()       //解析参数，默认是不会解析的
-	fmt.Println(r.Form) //这些信息是输出到服务器端的打印信息
-	fmt.Println("path", r.URL.Path)
-	fmt.Println("scheme", r.URL.Scheme)
-	fmt.Println(r.Form["url_long"])
-	for k, v := range r.Form {
-		fmt.Println("key:", k)
-		fmt.Println("val:", v)
-	}
-	fmt.Fprintf(w, "Hello") //这个写入到w的是输出到客户端的
+const (
+	HTTP_PORT string = "80"
+	TEST_PORT string = "9090"
+)
+
+func goAjax(res http.ResponseWriter, req *http.Request) {
+	io.WriteString(res, "这是从后台发送的数据")
+
+	res.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
+	res.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
+	res.Header().Set("content-type", "application/json")             //返回数据格式是json
+
+	req.ParseForm()
+	fmt.Println("收到客户端请求: ", req.Form)
+	fmt.Fprintf(res, "{'a':'222'}")
 }
 
 func main() {
-	http.HandleFunc("/", sayhelloName)     //设置访问的路由
-	err := http.ListenAndServe(":80", nil) //设置监听的端口
+
+	http.HandleFunc("/", goAjax)
+
+	err := http.ListenAndServe(":"+TEST_PORT, nil)
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		fmt.Println("服务失败 /// ", err)
 	}
 }
