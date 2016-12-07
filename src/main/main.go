@@ -3,114 +3,103 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"io"
+	"log"
 	"net/http"
-	"reflect"
+	"os"
+	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	HTTP_PORT string = "80"
-	TEST_PORT string = "9090"
-)
+func setSQL(key string, value string) {
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/stu_phone_num?charset=utf8")
+	if err != nil {
+		log.Println(err)
+	}
 
-func goAjax(res http.ResponseWriter, req *http.Request) {
-	io.WriteString(res, "这是从后台发送的数据")
+	// 插入一条新数据
+	result, err := db.Exec("INSERT INTO `stu`(" + key + ") VALUES(" + value + ")")
+	if err != nil {
+		fmt.Println("insert data failed:", err.Error())
+		return
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println("fetch last insert id failed:", err.Error())
+		return
+	}
+	fmt.Println("insert new record", id)
+	//在这里进行一些数据库操作
 
-	res.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
-	res.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
-	res.Header().Set("content-type", "application/json")             //返回数据格式是json
+	defer db.Close()
+}
 
-	req.ParseForm()
-	fmt.Println("收到客户端请求: ", req.Form)
-	fmt.Fprintf(res, "{'a':'222'}")
+func write(str string) {
+	userFile := "test.txt"
+	fout, err := os.Create(userFile)
+	defer fout.Close()
+	if err != nil {
+		fmt.Println(userFile, err)
+		return
+	}
+	fout.WriteString(str)
+}
+
+func sayhelloName(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
+	w.Header().Set("content-type", "application/json")             //返回数据格式是json
+	r.ParseForm()                                                  //解析参数，默认是不会解析的
+	// fmt.Println(r.Form)                                            //这些信息是输出到服务器端的打印信息
+	// fmt.Println("path", r.URL.Path)
+	// fmt.Println("scheme", r.URL.Scheme)
+	// fmt.Println(r.Form["url_long"])
+
+	// for k, v := range r.Form {
+	// 	fmt.Println("key:", k)
+	// 	fmt.Println("val:", strings.Join(v, ""))
+	// 	// write(strings.Join(v, "")
+	// 	// setSQL(k, strings.Join(v, ""))
+	// }
+	// fmt.Fprintf(w, "Hello astaxie!") //这个写入到w的是输出到客户端的
+	id := strings.Join(r.Form["id"], "")
+	username := strings.Join(r.Form["username"], "")
+	name := strings.Join(r.Form["name"], "")
+	unitInfo := strings.Join(r.Form["unit_info"], "")
+	mobile := strings.Join(r.Form["mobile"], "")
+	fmt.Println(id)
+	fmt.Println(username)
+	fmt.Println(name)
+	fmt.Println(unitInfo)
+	fmt.Println(mobile)
+
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/stu_phone_num")
+	if err != nil {
+		log.Println(err)
+	}
+
+	// 插入一条新数据
+	result, err := db.Exec("INSERT INTO `stu`(`id`,`username`,`name`,`unit_info`,`mobile`) VALUES(" + id + "," + username + "," + name + "," + unitInfo + "," + mobile + ")")
+	if err != nil {
+		fmt.Println("insert data failed:", err.Error())
+		return
+	}
+	// id, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println("fetch last insert id failed:", err.Error())
+		return
+	}
+	fmt.Println("insert new record", result)
+	//在这里进行一些数据库操作
+
+	defer db.Close()
 }
 
 func main() {
-
-	// http.HandleFunc("/", goAjax)
-
-	// err := http.ListenAndServe(":"+TEST_PORT, nil)
-	// if err != nil {
-	// 	fmt.Println("服务失败 /// ", err)
-	// }
-
-	linkSql()
-}
-
-func linkSql() {
-	/*DSN数据源名称
-	  [username[:password]@][protocol[(address)]]/dbname[?param1=value1¶mN=valueN]
-	  user@unix(/path/to/socket)/dbname
-	  user:password@tcp(localhost:5555)/dbname?charset=utf8&autocommit=true
-	  user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?charset=utf8mb4,utf8
-	  user:password@/dbname
-	  无数据库: user:password@/
-	*/
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/?charset=utf8") //第一个参数为驱动名
-	checkErr(err)
-	db.Query("drop database if exists tmpdb")
-	db.Query("create database tmpdb")
-	//db.Query("use tmpdb")
-	db.Query("create table tmpdb.tmptab(c1 int, c2 varchar(20), c3 varchar(20))")
-	db.Query("insert into tmpdb.tmptab values(101, '姓名1', 'address1'), (102, '姓名2', 'address2'), (103, '姓名3', 'address3'), (104, '姓名4', 'address4')")
-	//checkErr(err)
-	query, err := db.Query("select * from tmpdb.tmptab")
-
-	checkErr(err)
-	v := reflect.ValueOf(query)
-	fmt.Println(v)
-	fmt.Println("--增加数据测试--")
-	// printResult(query)
-	// db.Query("delete from tmpdb.tmptab where c1 = 101")
-	// //checkErr(err)
-	// query2, _ := db.Query("select * from tmpdb.tmptab")
-	// fmt.Println("--删除数据测试--")
-	// printResult(query2)
-	// db.Query("update tmpdb.tmptab set c3 = 'address4' where c1 = 103")
-	// //checkErr(err)
-	// query3, _ := db.Query("select * from tmpdb.tmptab")
-	// fmt.Println("--更新数据测试--")
-	// printResult(query3)
-	// db.Query("delete from tmpdb.tmptab")
-	// //checkErr(err)
-	// query4, _ := db.Query("select * from tmpdb.tmptab")
-	// fmt.Println("--清空数据测试--")
-	// printResult(query4)
-	// db.Query("drop table tmpdb.tmptab")
-	// db.Query("drop database tmpdb")
-	//stmt, err := db.Prepare("create database tmpdb")
-	db.Close()
-}
-
-func checkErr(errMasg error) {
-	if errMasg != nil {
-		panic(errMasg)
-	}
-}
-
-func printResult(query *sql.Rows) {
-	column, _ := query.Columns()              //读出查询出的列字段名
-	values := make([][]byte, len(column))     //values是每个列的值，这里获取到byte里
-	scans := make([]interface{}, len(column)) //因为每次查询出来的列是不定长的，用len(column)定住当次查询的长度
-	for i := range values {                   //让每一行数据都填充到[][]byte里面
-		scans[i] = &values[i]
-	}
-	results := make(map[int]map[string]string) //最后得到的map
-	i := 0
-	for query.Next() { //循环，让游标往下移动
-		if err := query.Scan(scans...); err != nil { //query.Scan查询出来的不定长值放到scans[i] = &values[i],也就是每行都放在values里
-			fmt.Println(err)
-			return
-		}
-		row := make(map[string]string) //每行数据
-		for k, v := range values {     //每行数据是放在values里面，现在把它挪到row里
-			key := column[k]
-			row[key] = string(v)
-		}
-		results[i] = row //装入结果集中
-		i++
-	}
-	for k, v := range results { //查询出来的数组
-		fmt.Println(k, v)
+	http.HandleFunc("/", sayhelloName)       //设置访问的路由
+	err := http.ListenAndServe(":9090", nil) //设置监听的端口
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
