@@ -11,29 +11,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func setSQL(key string, value string) {
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/stu_phone_num?charset=utf8")
-	if err != nil {
-		log.Println(err)
-	}
-
-	// 插入一条新数据
-	result, err := db.Exec("INSERT INTO `stu`(" + key + ") VALUES(" + value + ")")
-	if err != nil {
-		fmt.Println("insert data failed:", err.Error())
-		return
-	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		fmt.Println("fetch last insert id failed:", err.Error())
-		return
-	}
-	fmt.Println("insert new record", id)
-	//在这里进行一些数据库操作
-
-	defer db.Close()
-}
-
 func write(str string) {
 	userFile := "test.txt"
 	fout, err := os.Create(userFile)
@@ -43,6 +20,12 @@ func write(str string) {
 		return
 	}
 	fout.WriteString(str)
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
@@ -63,10 +46,13 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 	// 	// setSQL(k, strings.Join(v, ""))
 	// }
 	// fmt.Fprintf(w, "Hello astaxie!") //这个写入到w的是输出到客户端的
+
+	// l, err := url.ParseQuery(urlStr)
+
 	id := strings.Join(r.Form["id"], "")
 	username := strings.Join(r.Form["username"], "")
-	name := strings.Join(r.Form["name"], "")
-	unitInfo := strings.Join(r.Form["unit_info"], "")
+	name := (strings.Join(r.Form["name"], ""))
+	unitInfo := (strings.Join(r.Form["unit_info"], ""))
 	mobile := strings.Join(r.Form["mobile"], "")
 	fmt.Println(id)
 	fmt.Println(username)
@@ -74,24 +60,16 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(unitInfo)
 	fmt.Println(mobile)
 
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/stu_phone_num")
-	if err != nil {
-		log.Println(err)
-	}
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/stu_phone_num?charset=utf8")
+	checkErr(err)
 
-	// 插入一条新数据
-	result, err := db.Exec("INSERT INTO `stu`(`id`,`username`,`name`,`unit_info`,`mobile`) VALUES(" + id + "," + username + "," + name + "," + unitInfo + "," + mobile + ")")
-	if err != nil {
-		fmt.Println("insert data failed:", err.Error())
-		return
-	}
-	// id, err := result.LastInsertId()
-	if err != nil {
-		fmt.Println("fetch last insert id failed:", err.Error())
-		return
-	}
-	fmt.Println("insert new record", result)
-	//在这里进行一些数据库操作
+	stmt, err := db.Prepare("INSERT stu SET s_id=?,username=?,name=?,unit_info=?,mobile=?")
+	checkErr(err)
+
+	res, err := stmt.Exec(id, username, name, unitInfo, mobile)
+	checkErr(err)
+
+	fmt.Println(res)
 
 	defer db.Close()
 }
