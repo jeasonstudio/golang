@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	_ "github.com/Go-SQL-Driver/MySQL"
 	"github.com/jinzhu/gorm"
 	"github.com/nladuo/ustb_book_reminder/model"
-	"strconv"
-	"time"
 )
 
 //mysql配置
@@ -14,7 +15,7 @@ const (
 	DB_USER   = "root"
 	DB_PASSWD = "root"
 	DB_HOST   = "localhost"
-	DB_PORT   = "3306"
+	DB_PORT   = "8889"
 	DBNAME    = "ustb_book_reminder"
 )
 
