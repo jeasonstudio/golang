@@ -1,15 +1,31 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"archive/zip"
+	"fmt"
+	"io"
+	"os"
 )
 
 func main() {
+	rc, err := zip.OpenReader("a.zip")
 
-	err := http.ListenAndServe(":9090", nil) //设置监听的端口
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		defer rc.Close()
 	}
+	for _, _file := range rc.File {
+		fmt.Println(_file.Name)
 
+		f, _ := _file.Open()
+
+		desfile, err1 := os.OpenFile(_file.Name, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+		if err1 == nil {
+			fmt.Println("OK")
+			fmt.Println(int64(_file.UncompressedSize64))
+			io.CopyN(desfile, f, int64(_file.UncompressedSize64))
+			desfile.Close()
+		} else {
+			defer desfile.Close()
+		}
+	}
 }
