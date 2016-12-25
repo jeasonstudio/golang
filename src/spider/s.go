@@ -22,7 +22,7 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("found: %s %q\n", url, body)
+	fmt.Printf("found: %s \n %q\n", url, body)
 	for _, u := range urls {
 		Crawl(u, depth-1, fetcher)
 	}
