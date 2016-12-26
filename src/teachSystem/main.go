@@ -9,40 +9,29 @@ import (
 )
 
 func getAll(tagCookie string) {
-	thisCookie := " JSESSIONID=" + tagCookie
-	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/choosecourse/commonChooseCourse_courseList_loadTermCourses.action"
+	thisCookie := "JSESSIONID=" + tagCookie
+	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/loginsucc.action"
 
-	fmt.Println(thisCookie)
-
-	v := url.Values{}
-	v.Set("listXnxq", "2016-2017-1")
-	v.Set("uid", "41524122")
-	body := ioutil.NopCloser(strings.NewReader(v.Encode())) //把form数据编下码
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", tagLoginURL, body)
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value") //这个一定要加，不加form的值post不过去，被坑了两小时
-	// fmt.Printf("%+v\n", req)                                                         //看下发送的结构
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36")
-	req.Header.Set("Cookie", thisCookie)
-	req.Header.Set("X-Requested-With", "XMLHttpRequest")
-
-	// userCookie := $http.Cookie{
-	// 	Name:     "JSESSIONID",
-	// 	Value:    tagCookie,
-	// 	Path:     "/",
-	// 	HttpOnly: true,
-	// }
-
-	// req.AddCookie(userCookie)
-
-	resp, err := client.Do(req) //发送
-	defer resp.Body.Close()     //一定要关闭resp.Body
-	data, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(data), err)
+	req, err := http.NewRequest("GET", tagLoginURL, strings.NewReader(""))
 	if err != nil {
-		return
+		// handle error
 	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Cookie", thisCookie)
+
+	resp, err := client.Do(req)
+
+	defer resp.Body.Close()
+
+	// body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+
+	fmt.Println(resp.Body)
 
 }
 
