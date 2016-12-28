@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -8,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	_ "github.com/Go-SQL-Driver/MySQL"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -62,7 +64,7 @@ func Spy(tagURL string) bool {
 	bodyData, _ := ioutil.ReadAll(resp.Body)
 	// fmt.Println(string(bodyData))
 	if resp.StatusCode != 200 {
-		fmt.Println("An Error")
+		fmt.Println("HTTP GET Error!")
 		return false
 	}
 	myjson, _ := simplejson.NewJson(bodyData)
@@ -79,12 +81,58 @@ func Spy(tagURL string) bool {
 			href := "https://www.zhihu.com/api/v4/members/" + urlToken + "/followees?include=data[*].answer_count,articles_count,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics&offset=0&limit=500"
 			urlChannel <- href
 
-			// fmt.Println(myjson.Get("data").GetIndex(i).Get("id").String())
+			iName, _ := myjson.Get("data").GetIndex(i).Get("name").String()
+			isFollowed, _ := myjson.Get("data").GetIndex(i).Get("is_followed").Bool()
+			avatarURLTemplate, _ := myjson.Get("data").GetIndex(i).Get("avatar_url_template").String()
+			url, _ := myjson.Get("data").GetIndex(i).Get("url").String()
+			userType, _ := myjson.Get("data").GetIndex(i).Get("user_type").String()
+			answerCount, _ := myjson.Get("data").GetIndex(i).Get("name").Int()
+			urlToken, _ := myjson.Get("data").GetIndex(i).Get("url_token").String()
+			isAdvertiser, _ := myjson.Get("data").GetIndex(i).Get("is_advertiser").Bool()
+			avatarURL, _ := myjson.Get("data").GetIndex(i).Get("avatar_url").String()
+			isFollowing, _ := myjson.Get("data").GetIndex(i).Get("is_following").Bool()
+			isOrg, _ := myjson.Get("data").GetIndex(i).Get("is_org").Bool()
+			headline, _ := myjson.Get("data").GetIndex(i).Get("headline").String()
+			followerCount, _ := myjson.Get("data").GetIndex(i).Get("follower_count").Int()
+			ttype, _ := myjson.Get("data").GetIndex(i).Get("type").String()
+			id, _ := myjson.Get("data").GetIndex(i).Get("id").String()
+			articlesCount, _ := myjson.Get("data").GetIndex(i).Get("articles_count").Int()
+
+			insertDB(iName, isFollowed, avatarURLTemplate, url, userType, answerCount, urlToken, isAdvertiser, avatarURL, isFollowing, isOrg, headline, followerCount, ttype, id, articlesCount)
 		}
 
 	}
 
 	return true
+}
+
+func insertDB(name string, is_followed bool, avatar_url_template string, url string, user_type string, answer_count int, url_token string, is_advertiser bool, avatar_url string, is_following bool, is_org bool, headline string, follower_count int, the_type string, id string, articles_count int) {
+
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/zhihu_user?charset=utf8")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	stmt, err := db.Prepare("INSERT user SET name=?,is_followed=?,avatar_url_template=?,url=?,user_type=?,answer_count=?,url_token=?,is_advertiser=?,avatar_url=?,is_following=?,is_org=?,headline=?,follower_count=?,the_type=?,id=?,articles_count=?")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	res, err := stmt.Exec(name, is_followed, avatar_url_template, url, user_type, answer_count, url_token, is_advertiser, avatar_url, is_following, is_org, headline, follower_count, the_type, id, articles_count)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer db.Close()
+
+	// fmt.Println(res)
+	if res == nil {
+		fmt.Println("An Sql Error!")
+	}
+
 }
 
 func main() {
