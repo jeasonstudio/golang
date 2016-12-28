@@ -1,0 +1,28 @@
+{
+    "paging": {
+        "is_end": false,
+        "next": "https://www.zhihu.com/api/v4/members/excited-vczh/followers?include=data%5B%2A%5D.answer_count%2Carticles_count%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit=10&offset=18",
+        "previous": "https://www.zhihu.com/api/v4/members/excited-vczh/followers?include=data%5B%2A%5D.answer_count%2Carticles_count%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit=10&offset=0",
+        "is_start": false,
+        "totals": 471695
+    },
+    "data": [{
+        "is_followed": false,
+        "avatar_url_template": "https://pic3.zhimg.com/v2-645ab475562917947eaa40001594d0e2_{size}.jpg",
+        "name": "\u897f\u5b89\u5b89\u957f\u5b89\u4e71",
+        "url": "",
+        "badge": [],
+        "user_type": "people",
+        "answer_count": 0,
+        "url_token": "xi-an-an-chang-an-luan",
+        "is_advertiser": false,
+        "avatar_url": "https://pic3.zhimg.com/v2-645ab475562917947eaa40001594d0e2_is.jpg",
+        "is_following": false,
+        "is_org": false,
+        "headline": "\u4ec0\u4e48\u90fd\u5b66\uff0c\u4e0d\u5de7\u6709\u70b9\u624d",
+        "follower_count": 0,
+        "type": "people",
+        "id": "7e756b58ba7c6f26d7f21fca14fb15b8",
+        "articles_count": 0
+    }]
+}
