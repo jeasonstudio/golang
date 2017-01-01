@@ -4,53 +4,58 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
-func getAll(tagCookie string) {
-	thisCookie := "JSESSIONID=" + tagCookie
-	tagLoginURL := "http://zhiyuan.ustb.edu.cn/app.VPClient/index.jsp?m=vpclient&c=index&a=showIndex"
+// func main()  {
+//     tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/choosecourse/normalChooseCourse_normalRequired_loadPreNormalAccordByKchRequiredCourses.action?kch=2050414&_dc=1483270853482&limit=5000&start=0&uid=41524122"
 
-	client := &http.Client{}
-	req, _ := http.NewRequest("GET", tagLoginURL, nil)
+// 	client := &http.Client{}
+// 	req, _ := http.NewRequest("GET", tagLoginURL, nil)
 
-	req.Header.Set("Cookie", thisCookie)
+// 	// req.Header.Set("Cookie", thisCookie)
 
-	resp, err := client.Do(req) //发送
-	defer resp.Body.Close()     //一定要关闭resp.Body
-	data, _ := ioutil.ReadAll(resp.Body)
-	// fmt.Println(string(data), err)
-	if err != nil {
-		return
-	}
-
-	str := strings.NewReader(string(data))
-
-	doc, _ := goquery.NewDocumentFromReader(str)
-
-	res := doc.Find(".grxx_text .jj li span a").Text()
-
-	fmt.Println("我已获得志愿工时：" + res + "小时")
-
-}
+// 	resp, err := client.Do(req) //发送
+// 	defer resp.Body.Close()     //一定要关闭resp.Body
+// 	data, _ := ioutil.ReadAll(resp.Body)
+// 	fmt.Println(string(data), err)
+// 	if err != nil {
+// 		return
+// 	}
+// }
 
 func main() {
-	tagLoginURL := "http://teach.ustb.edu.cn/"
+	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/j_spring_security_check"
+
+	v := url.Values{"j_username": {"41524122,undergraduate"}, "j_password": {"07060016"}}
+	body := ioutil.NopCloser(strings.NewReader(v.Encode()))
 
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", tagLoginURL, nil)
 
-	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.8,it;q=0.6,fr;q=0.4,en;q=0.2,zh-TW;q=0.2")
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+	req, err := http.NewRequest(http.MethodPost, tagLoginURL, body)
 
-	resp, err := client.Do(req) //发送
-	defer resp.Body.Close()     //一定要关闭resp.Body
-	data, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(data), err)
 	if err != nil {
-		return
+		fmt.Println("Fatal error ", err.Error())
+		os.Exit(0)
 	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// req.Header.Set("Content-Length", "55")
+	// req.Header.Set("Referer", "http://elearning.ustb.edu.cn/choose_courses/index.action")
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)
+
+	fmt.Println(string(data))
+	// fmt.Println(resp.Header.Date)
+	// if resp.StatusCode == 200 {
+
+	// 	// tagCookie := strings.Split(strings.Split(resp.Header["Set-Cookie"][0], ";")[0], "=")[1]
+
+	// 	// fmt.Println(tagCookie)
+	// 	fmt.Println(resp)
+
+	// 	// getAll(tagCookie)
+	// }
 
 }
