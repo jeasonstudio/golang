@@ -1,9 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"os"
+	"strings"
 )
 
 // func main()  {
@@ -23,6 +27,13 @@ import (
 // 	}
 // }
 
+func defaultCheckRedirect(req *Request, via []*Request) error {
+	if len(via) >= 10 {
+		return errors.New("stopped after 10 redirects")
+	}
+	return nil
+}
+
 func main() {
 	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/j_spring_security_check"
 
@@ -39,23 +50,13 @@ func main() {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	// req.Header.Set("Content-Length", "55")
-	// req.Header.Set("Referer", "http://elearning.ustb.edu.cn/choose_courses/index.action")
 
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 
 	fmt.Println(string(data))
-	// fmt.Println(resp.Header.Date)
-	// if resp.StatusCode == 200 {
 
-	// 	// tagCookie := strings.Split(strings.Split(resp.Header["Set-Cookie"][0], ";")[0], "=")[1]
-
-	// 	// fmt.Println(tagCookie)
-	// 	fmt.Println(resp)
-
-	// 	// getAll(tagCookie)
-	// }
+	redirectChecker := defaultCheckRedirect
 
 }
