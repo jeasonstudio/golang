@@ -33,17 +33,6 @@ import (
 // 	return nil
 // }
 
-func typeSwitch(tst interface{}) {
-    switch v := tst.(type) {
-        case string:
-           fmt.Println("Stringer:", v)
-		case  []interface{}:
-			fmt.Println("in")
-        default:
-           fmt.Println("Unknown")
-    }
-}
-
 func main() {
 	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/j_spring_security_check"
 
@@ -65,26 +54,11 @@ func main() {
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 
-	// tagCookie := strings.Split(resp.Request.URL,";")[1]
+	// typeSwitch(resp.Request.URL)
 
-	// aaaa := funcName(resp.Request.URL)
-	// var interCookie interface{} = resp.Request.URL
-    // j := interCookie.(string)
+	tagCookie := strings.Split(string(*resp.Request.URL),"=")[0]
 
-	// fmt.Printf("%s",resp.Request.URL)
-
-	// j := resp.Request.URL.(string)
-	// var idx interface {}
-	var tag string
-	switch v := resp.Request.URL.(type) {
-		default:
-			tag = string(v)
-		case int, int8, int16, int32, int64:
-		case float32:
-		case float64:
-	}
-
-	fmt.Println(tag)
+	fmt.Printf("%s",tagCookie)
 	fmt.Println(string(data))
 
 }
