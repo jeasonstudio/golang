@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -27,12 +26,12 @@ import (
 // 	}
 // }
 
-func defaultCheckRedirect(req *Request, via []*Request) error {
-	if len(via) >= 10 {
-		return errors.New("stopped after 10 redirects")
-	}
-	return nil
-}
+// func defaultCheckRedirect(req *Request, via []*Request) error {
+// 	if len(via) >= 10 {
+// 		return errors.New("stopped after 10 redirects")
+// 	}
+// 	return nil
+// }
 
 func main() {
 	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/j_spring_security_check"
@@ -56,7 +55,5 @@ func main() {
 	data, _ := ioutil.ReadAll(resp.Body)
 
 	fmt.Println(string(data))
-
-	redirectChecker := defaultCheckRedirect
 
 }
