@@ -33,6 +33,10 @@ import (
 // 	return nil
 // }
 
+func change(a interface{}) string  {
+	return a.(string)
+}
+
 func main() {
 	tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/j_spring_security_check"
 
@@ -56,9 +60,9 @@ func main() {
 
 	// typeSwitch(resp.Request.URL)
 
-	tagCookie := strings.Split(string(*resp.Request.URL),"=")[0]
+	// tagCookie := strings.Split(string(*resp.Request.URL),"=")[0]
 
-	fmt.Printf("%s",tagCookie)
+	fmt.Println(change(resp.Request.URL))
 	fmt.Println(string(data))
 
 }
