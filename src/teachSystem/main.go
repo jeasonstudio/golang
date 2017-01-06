@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/jeasonstudio/noRedirectHttp"
 )
 
 // func main()  {
