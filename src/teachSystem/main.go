@@ -62,7 +62,7 @@ func main() {
 
 	// tagCookie := strings.Split(string(*resp.Request.URL),"=")[0]
 
-	fmt.Println(change(resp.Request.URL))
+	fmt.Println((resp.Request.URL.Type()))
 	fmt.Println(string(data))
 
 }
