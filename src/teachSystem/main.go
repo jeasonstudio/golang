@@ -8,33 +8,35 @@ import (
 	"os"
 	"strings"
 )
+const (
+	LIST_XNXQ = "2016-2017-1"
+	UID = "41524122"
+)
 
-// func main()  {
-//     tagLoginURL := "http://elearning.ustb.edu.cn/choose_courses/choosecourse/normalChooseCourse_normalRequired_loadPreNormalAccordByKchRequiredCourses.action?kch=2050414&_dc=1483270853482&limit=5000&start=0&uid=41524122"
+func getCourse(jsessionid string)  {
+	getCourseUrl := "http://elearning.ustb.edu.cn/choose_courses/choosecourse/commonChooseCourse_courseList_loadTermCourses.action"
 
-// 	client := &http.Client{}
-// 	req, _ := http.NewRequest("GET", tagLoginURL, nil)
+	v := url.Values{"listXnxq": {LIST_XNXQ}, "uid": {UID}}
+	body := ioutil.NopCloser(strings.NewReader(v.Encode()))
 
-// 	// req.Header.Set("Cookie", thisCookie)
+	client := &http.Client{}
 
-// 	resp, err := client.Do(req) //发送
-// 	defer resp.Body.Close()     //一定要关闭resp.Body
-// 	data, _ := ioutil.ReadAll(resp.Body)
-// 	fmt.Println(string(data), err)
-// 	if err != nil {
-// 		return
-// 	}
-// }
+	req, err := http.NewRequest(http.MethodPost, getCourseUrl, body)
 
-// func defaultCheckRedirect(req *Request, via []*Request) error {
-// 	if len(via) >= 10 {
-// 		return errors.New("stopped after 10 redirects")
-// 	}
-// 	return nil
-// }
+	if err != nil {
+		fmt.Println("Fatal error ", err.Error())
+		os.Exit(0)
+	}
 
-func change(a interface{}) string  {
-	return a.(string)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Cookie", jsessionid)
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)
+
+	fmt.Println(string(data))
+
 }
 
 func main() {
@@ -58,11 +60,11 @@ func main() {
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 
-	// typeSwitch(resp.Request.URL)
+	res := fmt.Sprintf("%s",resp.Request.URL)
+	tagCookies := strings.Split(res,";")[1]
 
-	// tagCookie := strings.Split(string(*resp.Request.URL),"=")[0]
-
-	fmt.Println((resp.Request.URL.Type()))
+	fmt.Println(tagCookies)
 	fmt.Println(string(data))
 
+	getCourse(tagCookies)
 }
