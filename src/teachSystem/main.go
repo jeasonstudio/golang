@@ -7,6 +7,9 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+
 )
 const (
 	LIST_XNXQ = "2016-2017-1"
@@ -75,7 +78,7 @@ func getInnvoationScore(jsessionid string)  {
 
 	res := doc.Find("td").Text()
 
-	// fmt.Println(string(data))
+	fmt.Println(res)
 
 }
 
