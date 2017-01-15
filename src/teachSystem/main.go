@@ -69,7 +69,13 @@ func getInnvoationScore(jsessionid string)  {
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 
-	fmt.Println(string(data))
+	str := strings.NewReader(string(data))
+
+	doc, _ := goquery.NewDocumentFromReader(str)
+
+	res := doc.Find("td").Text()
+
+	// fmt.Println(string(data))
 
 }
 
